@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculator</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .calculator {
+      width: 300px;
+      padding: 20px;
+      background: #1e1e2e;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+
+    #layar {
+      width: 100%;
+      margin-bottom: 16px;
+      padding: 18px 14px;
+      font-size: 32px;
+      font-weight: bold;
+      text-align: right;
+      background: #2a2a3a;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      outline: none;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      padding: 18px 0;
+      font-size: 20px;
+      font-weight: 600;
+      background: #33334a;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      aspect-ratio: 1 / 1;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    button:hover { filter: brightness(1.25); }
+    button:active { transform: scale(0.92); }
+
+    .operator { background: #ff9f0a; color: #fff; }
+    .clear { background: #ff453a; color: #fff; }
+    .delete { background: #a0a0b0; color: #000; }
+    .equals { background: #30d158; color: #fff; }
+
+    .lebar {
+      grid-column: span 2;
+      aspect-ratio: auto;
+      border-radius: 50px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator">
+    <input type="text" id="layar" value="0" readonly>
+
+    <div class="buttons">
+      <button class="clear" onclick="hapus()">C</button>
+      <button class="delete" onclick="mundur()">⌫</button>
+      <button class="operator" onclick="tambah('%')">%</button>
+      <button class="operator" onclick="tambah('÷')">÷</button>
+
+      <button onclick="tambah('7')">7</button>
+      <button onclick="tambah('8')">8</button>
+      <button onclick="tambah('9')">9</button>
+      <button class="operator" onclick="tambah('×')">×</button>
+
+      <button onclick="tambah('4')">4</button>
+      <button onclick="tambah('5')">5</button>
+      <button onclick="tambah('6')">6</button>
+      <button class="operator" onclick="tambah('−')">−</button>
+
+      <button onclick="tambah('1')">1</button>
+      <button onclick="tambah('2')">2</button>
+      <button onclick="tambah('3')">3</button>
+      <button class="operator" onclick="tambah('+')">+</button>
+
+      <button class="lebar" onclick="tambah('0')">0</button>
+      <button onclick="tambah('.')">.</button>
+      <button class="equals" onclick="hitung()">=</button>
+    </div>
+  </div>
+
+  <script>
+    const layar = document.getElementById('layar');
+
+    // Tambah angka / operator - yang tampil di layar udah cantik × ÷ −
+    function tambah(nilai) {
+      if (layar.value === '0' || layar.value === 'Error') {
+        if (nilai === '.') {
+          layar.value = '0.';
+        } else if (['+', '−', '×', '÷', '%'].includes(nilai)) {
+          layar.value = '0' + nilai;
+        } else {
+          layar.value = nilai;
+        }
+      } else {
+        let terakhir = layar.value.slice(-1);
+        let operator = ['+', '−', '×', '÷', '%', '.'];
+        // Cegah operator double kayak ×× atau ++
+        if (operator.includes(terakhir) && operator.includes(nilai)) {
+          return;
+        }
+        layar.value += nilai;
+      }
+    }
+
+    // C = hapus semua
+    function hapus() {
+      layar.value = '0';
+    }
+
+    // ⌫ = hapus 1 huruf
+    function mundur() {
+      layar.value = layar.value.slice(0, -1);
+      if (layar.value === '' || layar.value === '−') {
+        layar.value = '0';
+      }
+    }
+
+    // = = hitung - disini baru diubah ke * / - buat mesin
+    function hitung() {
+      try {
+        let teks = layar.value
+          .replace(/×/g, '*')
+          .replace(/÷/g, '/')
+          .replace(/−/g, '-')
+          .replace(/%/g, '/100');
+        let hasil = eval(teks);
+        layar.value = hasil;
+      } catch {
+        layar.value = 'Error';
+      }
+    }
+
+    // Keyboard juga udah disesuain
+    document.addEventListener('keydown', (e) => {
+      if ('0123456789+-*/.%'.includes(e.key)) {
+        let peta = { '*': '×', '/': '÷', '-': '−' };
+        tambah(peta[e.key] || e.key);
+      }
+      else if (e.key === 'Enter' || e.key === '=') hitung();
+      else if (e.key === 'Backspace') mundur();
+      else if (e.key.toLowerCase() === 'c' || e.key === 'Escape') hapus();
+    });
+  </script>
+
+</body>
+</html>
